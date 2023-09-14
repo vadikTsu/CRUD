@@ -1,6 +1,7 @@
 package ua.com.foxminded.repository;
 
 
+import org.flywaydb.core.Flyway;
 import org.postgresql.jdbc3.Jdbc3SimpleDataSource;
 
 import javax.sql.DataSource;
@@ -21,8 +22,8 @@ public class EmploeeRepositoryConfig {
             dataSource.setUser(props.getProperty("H2_DB_USERNAME"));  // Use the H2 database username property
             dataSource.setPassword(props.getProperty("H2_DB_PASSWORD"));  // Use the H2 database password property
             System.out.println("Connected to the H2 database");
-//            Flyway flyway = Flyway.configure().dataSource(dataSource).schemas("public").load();
-//            flyway.migrate();
+            Flyway flyway = Flyway.configure().dataSource(dataSource).validateOnMigrate(false).load();
+            flyway.migrate();
             return dataSource;
         } catch (FileNotFoundException e) {
             throw new RuntimeException(e);
