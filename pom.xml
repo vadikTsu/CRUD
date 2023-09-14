@@ -42,6 +42,11 @@
             <version>1.7.4</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <version>42.2.27</version> <!-- Replace with the latest version -->
+        </dependency>
         <!-- https://mvnrepository.com/artifact/com.h2database/h2 -->
         <dependency>
             <groupId>com.h2database</groupId>
@@ -52,13 +57,21 @@
         <dependency>
             <groupId>org.flywaydb</groupId>
             <artifactId>flyway-core</artifactId>
-            <version>8.0.0</version> <!-- Use the latest version -->
+            <version>9.17.0</version> <!-- Use the latest version -->
         </dependency>
-
     </dependencies>
 
     <build>
         <plugins>
+            <plugin>
+                <groupId>org.flywaydb</groupId>
+                <artifactId>flyway-maven-plugin</artifactId>
+                <version>9.17.0</version>
+<!--                <configuration>-->
+<!--                    <url>jdbc:h2:file:./target/foobar</url>-->
+<!--                    <user>sa</user>-->
+<!--                </configuration>-->
+            </plugin>
             <plugin>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.8.1</version>
