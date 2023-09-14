@@ -14,7 +14,6 @@ import java.util.List;
 public class EmploeeRepository {
 
     private final DataSource dataSource;
-
     private static final String FIND_ALL_GROUPS_WHERE_LESS_STUDENTS_THAN =
                 "SELECT " +
                     "groups.group_id, " +
@@ -41,6 +40,9 @@ public class EmploeeRepository {
             "JOIN " +
                 "courses ON students_courses.course_id = courses.course_id " +
             "WHERE courses.course_name = ?;";
+    private static final String ADD_NEW_STUDENT =
+            "INSERT INTO students(group_id, first_name, last_name) " +
+                    "VALUES ((SELECT group_id  FROM groups WHERE groups.group_id = ? ), ?, ?)";
 
     public EmploeeRepository(DataSource dataSource) {
         this.dataSource = dataSource;
@@ -55,15 +57,36 @@ public class EmploeeRepository {
                     int studentId = resultSet.getInt("student_id");
                     String firstName = resultSet.getString("first_name");
                     String lastName = resultSet.getString("last_name");
+                    String groupId = resultSet.getString("group_id");
                     System.out.println("Student ID: " + studentId);
                     System.out.println("First Name: " + firstName);
                     System.out.println("Last Name: " + lastName);
+                    System.out.println("GROUP: " + groupId);
+
                     System.out.println("------------------------");
                 }
             }
         }
     }
 
+    public void getGroupsData() throws SQLException {
+        try (Connection connection = dataSource.getConnection()) {
+            String query = "SELECT * FROM groups";
+            try (PreparedStatement preparedStatement = connection.prepareStatement(query);
+                 ResultSet resultSet = preparedStatement.executeQuery()) {
+                while (resultSet.next()) {
+
+                    String lastName = resultSet.getString("group_name");
+                    int groupId = resultSet.getInt("group_id");
+
+                    System.out.println("Last Name: " + lastName);
+                    System.out.println("GROUP: " + groupId);
+
+                    System.out.println("------------------------");
+                }
+            }
+        }
+    }
 
     public List<Group> getAllGroupsWithLessOrEqualStudents(int numberOfStudents) throws SQLException {
         try (Connection connection = dataSource.getConnection();
@@ -96,6 +119,16 @@ public class EmploeeRepository {
                 }
                 return students;
             }
+        }
+    }
+
+    public void addNewStudent(Student student) throws SQLException {
+        try (Connection connection = dataSource.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(ADD_NEW_STUDENT)) {
+            preparedStatement.setInt(1, student.getGroupId());
+            preparedStatement.setString(2, student.getFirstName());
+            preparedStatement.setString(3, student.getLastName());
+            preparedStatement.executeUpdate();
         }
     }
 }

@@ -1,8 +1,9 @@
 package ua.com.foxminded.dto;
 
 public class Group {
-    long groupId;
-    String groupName;
+
+    private long groupId;
+    private String groupName;
 
     public Group(long groupId, String groupName) {
         this.groupId = groupId;
@@ -15,5 +16,13 @@ public class Group {
 
     public String getGroupName() {
         return groupName;
+    }
+
+    @Override
+    public String toString() {
+        return "Group{" +
+                "groupId=" + groupId +
+                ", groupName='" + groupName + '\'' +
+                '}';
     }
 }

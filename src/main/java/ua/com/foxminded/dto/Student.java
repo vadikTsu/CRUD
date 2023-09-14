@@ -31,7 +31,12 @@ public class Student {
     }
 
     @Override
-    public String toString(){
-        return getFirstName() +" " + getLastName();
+    public String toString() {
+        return "Student{" +
+                "studentId=" + studentId +
+                ", groupId=" + groupId +
+                ", firstName='" + firstName + '\'' +
+                ", lastName='" + lastName + '\'' +
+                '}';
     }
 }

@@ -1,5 +1,6 @@
 package ua.com.foxminded;
 
+import ua.com.foxminded.dto.Student;
 import ua.com.foxminded.repository.EmploeeRepository;
 import ua.com.foxminded.repository.EmploeeRepositoryConfig;
 
@@ -8,7 +9,14 @@ import java.sql.SQLException;
 
 public class Main {
     public static void main(String[] args) throws IOException, SQLException {
-        System.out.println(new EmploeeRepository(EmploeeRepositoryConfig.getPostgresDataSource()).findAllStudentsRelatedToTheCourse("Biology"));
+//        new EmploeeRepository(EmploeeRepositoryConfig.getPostgresDataSource()).findAllStudentsRelatedToTheCourse("Biology").forEach(System.out::println);
+        EmploeeRepository repository = new EmploeeRepository(EmploeeRepositoryConfig.getPostgresDataSource());
+
+            repository.addNewStudent(new Student(1, 4, "asd", "af"));
+
+        repository.getStudentsData();
+        repository.getGroupsData();
+
     }
 }
 //  Create a sql-jdbc-school application  that inserts/updates/deletes data in the database using JDBC.

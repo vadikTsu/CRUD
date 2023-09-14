@@ -4,31 +4,35 @@ DROP TABLE IF EXISTS courses;
 DROP TABLE IF EXISTS groups;
 
 -- Create the groups table
-CREATE TABLE groups (
-                        group_id SERIAL PRIMARY KEY,
-                        group_name VARCHAR(255)
+CREATE TABLE groups
+(
+    group_id   SERIAL PRIMARY KEY,
+    group_name VARCHAR(255)
 );
 
 -- Create the students table
-CREATE TABLE students (
-                          student_id SERIAL PRIMARY KEY,
-                          group_id INT,
-                          first_name VARCHAR(50),
-                          last_name VARCHAR(50)
+CREATE TABLE students
+(
+    student_id SERIAL PRIMARY KEY,
+    group_id   INT REFERENCES groups(group_id),
+    first_name VARCHAR(50),
+    last_name  VARCHAR(50)
 );
 
 -- Create the courses table
-CREATE TABLE courses (
-                         course_id SERIAL PRIMARY KEY,
-                         course_name VARCHAR(100),
-                         course_description TEXT
+CREATE TABLE courses
+(
+    course_id          SERIAL PRIMARY KEY,
+    course_name        VARCHAR(100),
+    course_description TEXT
 );
 
 -- Create the many-to-many relation between students and courses
-CREATE TABLE students_courses (
-                                  student_id INT,
-                                  course_id INT,
-                                  PRIMARY KEY (student_id, course_id)
+CREATE TABLE students_courses
+(
+    student_id INT,
+    course_id  INT,
+    PRIMARY KEY (student_id, course_id)
 );
 
 INSERT INTO groups (group_name)
