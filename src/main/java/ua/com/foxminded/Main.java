@@ -1,21 +1,17 @@
 package ua.com.foxminded;
 
-import ua.com.foxminded.dto.Student;
 import ua.com.foxminded.repository.EmploeeRepository;
 import ua.com.foxminded.repository.EmploeeRepositoryConfig;
+import ua.com.foxminded.service.SchoolService;
 
 import java.io.IOException;
 import java.sql.SQLException;
 
 public class Main {
     public static void main(String[] args) throws IOException, SQLException {
-//        new EmploeeRepository(EmploeeRepositoryConfig.getPostgresDataSource()).findAllStudentsRelatedToTheCourse("Biology").forEach(System.out::println);
-        EmploeeRepository repository = new EmploeeRepository(EmploeeRepositoryConfig.getPostgresDataSource());
+         new SchoolService(new EmploeeRepository(EmploeeRepositoryConfig.getPostgresDataSource())).getConsole();
 
-            repository.addNewStudent(new Student(1, 4, "asd", "af"));
-
-        repository.getStudentsData();
-        repository.getGroupsData();
+//        repository.getGroupsData();
 
     }
 }
