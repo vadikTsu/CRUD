@@ -2,7 +2,7 @@ package ua.com.foxminded.service;
 
 import ua.com.foxminded.dto.Group;
 import ua.com.foxminded.dto.Student;
-import ua.com.foxminded.repository.EmploeeRepository;
+import ua.com.foxminded.repository.SchoolRepository;
 
 import java.sql.SQLException;
 import java.util.List;
@@ -10,9 +10,9 @@ import java.util.Scanner;
 
 public class SchoolService {
 
-    private final EmploeeRepository emploeeRepository;
+    private final SchoolRepository emploeeRepository;
 
-    public SchoolService(EmploeeRepository emploeeRepository) {
+    public SchoolService(SchoolRepository emploeeRepository) {
         this.emploeeRepository = emploeeRepository;
     }
 
@@ -45,7 +45,7 @@ public class SchoolService {
                     deleteStudentDialog(scanner);
                     break;
                 case "e":
-                    //todo add a list of students
+                    //todo add a list of students (from excel)
                     break;
                 case "f":
                     reomoveStudentFromCourseDialog(scanner);
@@ -64,9 +64,9 @@ public class SchoolService {
     private void reomoveStudentFromCourseDialog(Scanner scanner) throws SQLException {
         System.out.print("Enter the student ID: ");
         int studentId = scanner.nextInt();
-        scanner.nextLine();
         System.out.print("Enter the course name: ");
-        String courseName = scanner.nextLine();
+        int courseName = scanner.nextInt();
+        scanner.nextInt();
         emploeeRepository.reomoveStudentFromCourse(studentId, courseName);
     }
 
@@ -90,6 +90,7 @@ public class SchoolService {
         emploeeRepository.addNewStudent(newStudent);
         System.out.println("Student added successfully.");
     }
+
     private void findAllStudentsRelatedToTheCourseDialog(Scanner scanner) throws SQLException {
         System.out.print("Enter the course name: ");
         String courseName = scanner.nextLine();

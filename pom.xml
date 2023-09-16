@@ -15,6 +15,11 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <junit.jupiter.version>5.9.3</junit.jupiter.version>
         <mockito.version>4.2.0</mockito.version>
+        <slf4j.version>1.7.30</slf4j.version>
+        <logback.version>1.2.9</logback.version>
+        <postgresql.version>42.2.27</postgresql.version>
+        <testcontainers.version>1.19.0</testcontainers.version>
+        <flyway.version>9.17.0</flyway.version>
     </properties>
 
     <dependencies>
@@ -37,27 +42,30 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.powermock</groupId>
-            <artifactId>powermock-api-mockito</artifactId>
-            <version>1.7.4</version>
-            <scope>test</scope>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>${slf4j.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+            <version>${logback.version}</version>
         </dependency>
         <dependency>
             <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
-            <version>42.2.27</version> <!-- Replace with the latest version -->
+            <version>${postgresql.version}</version>
         </dependency>
-        <!-- https://mvnrepository.com/artifact/com.h2database/h2 -->
         <dependency>
-            <groupId>com.h2database</groupId>
-            <artifactId>h2</artifactId>
-            <version>2.2.222</version>
-            <scope>src</scope>
+            <groupId>org.testcontainers</groupId>
+            <artifactId>postgresql</artifactId>
+            <version>${testcontainers.version}</version>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.flywaydb</groupId>
             <artifactId>flyway-core</artifactId>
-            <version>9.17.0</version> <!-- Use the latest version -->
+            <version>${flyway.version}</version>
         </dependency>
     </dependencies>
 
@@ -67,10 +75,6 @@
                 <groupId>org.flywaydb</groupId>
                 <artifactId>flyway-maven-plugin</artifactId>
                 <version>9.17.0</version>
-<!--                <configuration>-->
-<!--                    <url>jdbc:h2:file:./target/foobar</url>-->
-<!--                    <user>sa</user>-->
-<!--                </configuration>-->
             </plugin>
             <plugin>
                 <artifactId>maven-compiler-plugin</artifactId>
@@ -104,5 +108,4 @@
             </plugin>
         </plugins>
     </build>
-
 </project>

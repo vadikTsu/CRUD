@@ -1,18 +1,11 @@
 package ua.com.foxminded;
 
-import ua.com.foxminded.repository.EmploeeRepository;
-import ua.com.foxminded.repository.EmploeeRepositoryConfig;
-import ua.com.foxminded.service.SchoolService;
-
 import java.io.IOException;
 import java.sql.SQLException;
 
 public class Main {
     public static void main(String[] args) throws IOException, SQLException {
-         new SchoolService(new EmploeeRepository(EmploeeRepositoryConfig.getPostgresDataSource())).getConsole();
-
-//        repository.getGroupsData();
-
+//         new SchoolRepository(SchoolRepositoryConfig.getPostgresDataSource());
     }
 }
 //  Create a sql-jdbc-school application  that inserts/updates/deletes data in the database using JDBC.

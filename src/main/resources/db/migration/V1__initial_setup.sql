@@ -83,3 +83,4 @@ FROM
          (SELECT course_id FROM courses) AS course_ids) AS subquery
 WHERE
         row_num <= (FLOOR(RANDOM() * 3) + 1);
+
