@@ -5,7 +5,7 @@ import java.sql.SQLException;
 
 public class Main {
     public static void main(String[] args) throws IOException, SQLException {
-//         new SchoolRepository(SchoolRepositoryConfig.getPostgresDataSource());
+//         new SchoolRepository(SchoolRepositoryConfig.getPostgresDataSource()).reomoveStudentFromCourse(1,3);
     }
 }
 //  Create a sql-jdbc-school application  that inserts/updates/deletes data in the database using JDBC.
