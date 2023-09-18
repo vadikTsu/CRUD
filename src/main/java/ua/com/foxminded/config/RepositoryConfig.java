@@ -1,5 +1,4 @@
-package ua.com.foxminded.repository;
-
+package ua.com.foxminded.config;
 
 import org.flywaydb.core.Flyway;
 import org.flywaydb.core.api.FlywayException;
@@ -8,14 +7,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.sql.DataSource;
-import java.io.IOException;
 
+public class RepositoryConfig {
 
-public class SchoolRepositoryConfig {
+    private static Logger logger = LoggerFactory.getLogger(RepositoryConfig.class);
 
-    private static Logger logger = LoggerFactory.getLogger(SchoolRepositoryConfig.class);
-
-    public static DataSource getPostgresDataSource(String url, String username , String password) throws IOException {
+    public static DataSource getPostgresDataSource(String url, String username , String password) {
         Jdbc3SimpleDataSource dataSource = new Jdbc3SimpleDataSource();
         dataSource.setURL(url);
         dataSource.setUser(username);

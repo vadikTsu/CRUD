@@ -3,14 +3,57 @@ DROP TABLE IF EXISTS students;
 DROP TABLE IF EXISTS courses;
 DROP TABLE IF EXISTS groups;
 
--- Create the groups table
+-- stored function
+CREATE OR REPLACE FUNCTION get_students_related_to_course(given_course_name VARCHAR)
+RETURNS TABLE (student_id INT, group_id INT, first_name VARCHAR, last_name VARCHAR) AS
+$$
+BEGIN
+    RETURN QUERY
+    SELECT
+        students.student_id,
+        students.group_id,
+        students.first_name,
+        students.last_name
+    FROM
+        students
+    JOIN
+        students_courses ON students.student_id = students_courses.student_id
+    JOIN
+        courses ON students_courses.course_id = courses.course_id
+    WHERE
+        courses.course_name = given_course_name;
+END;
+$$ LANGUAGE plpgsql;
+
+-- stored function
+CREATE OR REPLACE FUNCTION get_groups_with_less_students(student_count_limit INT)
+RETURNS TABLE (group_id INT, group_name VARCHAR) AS
+$$
+BEGIN
+    RETURN QUERY
+    SELECT
+        groups.group_id,
+        groups.group_name
+    FROM
+        groups
+    LEFT JOIN
+        students ON groups.group_id = students.group_id
+    GROUP BY
+        groups.group_id, groups.group_name
+    HAVING
+        COUNT(students.student_id) <= student_count_limit;
+END;
+$$
+LANGUAGE plpgsql;
+
+-- groups table
 CREATE TABLE groups
 (
     group_id   SERIAL PRIMARY KEY,
     group_name VARCHAR(255)
 );
 
--- Create the students table
+-- students table
 CREATE TABLE students
 (
     student_id SERIAL PRIMARY KEY,
@@ -19,7 +62,7 @@ CREATE TABLE students
     last_name  VARCHAR(50)
 );
 
--- Create the courses table
+-- courses table
 CREATE TABLE courses
 (
     course_id          SERIAL PRIMARY KEY,
@@ -27,7 +70,7 @@ CREATE TABLE courses
     course_description TEXT
 );
 
--- Create the many-to-many relation between students and courses
+-- many-to-many relation between students and courses
 CREATE TABLE students_courses
 (
     student_id INT references students(student_id),
@@ -41,12 +84,7 @@ VALUES
     ('Group 2'),
     ('Group 3'),
     ('Group 4'),
-    ('Group 5'),
-    ('Group 6'),
-    ('Group 7'),
-    ('Group 8'),
-    ('Group 9'),
-    ('Group 10');
+    ('Group 5');
 
 -- Insert data into the students table
 INSERT INTO students (group_id, first_name, last_name)
@@ -60,9 +98,9 @@ VALUES (1, 'John', 'Doe'),
        (4, 'David', 'Walker'),
        (5, 'Emily', 'Taylor'),
        (5, 'Frank', 'Harris'),
-       (6, 'Bruno', 'Erica'),
-       (6, 'Zane', 'Jenna'),
-       (7, 'Tanisha', 'Todd'),
+       (5, 'Bruno', 'Erica'),
+       (3, 'Zane', 'Jenna'),
+       (1, 'Tanisha', 'Todd'),
        (4, 'Abbot', 'Eagan'),
        (2, 'Hayes', 'Harper'),
        (1, 'Adele', 'Ramona'),
@@ -80,13 +118,6 @@ VALUES (1, 'John', 'Doe'),
        (3, 'Yardley', 'Basia'),
        (5, 'Adrienne', 'Jonah'),
        (1, 'Meghan', 'Hakeem');
-
--- INSERT INTO students (group_id, first_name, last_name)
--- SELECT
---     (random() * 10 + 1)::int AS group_id,
---         (SELECT first_name FROM (SELECT unnest('{John, Alice, Eva, Anna, Emily, Michael, Sara, Mark, Laura, Alex}'::text[])) AS first_names ORDER BY random() LIMIT 1),
---     (SELECT last_name FROM (SELECT unnest('{Smith, Johnson, Lee, Clark, Taylor, Brown, White, Harris, Davis, Miller}'::text[])) AS last_names ORDER BY random() LIMIT 1)
--- FROM generate_series(1, 10);
 
 -- Insert data into the courses table
 INSERT INTO courses (course_name, course_description)

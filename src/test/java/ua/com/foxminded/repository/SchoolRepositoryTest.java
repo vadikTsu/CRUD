@@ -8,7 +8,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import javax.sql.DataSource;
 
-//todo implement testing
+//todo implement testing adter adding custom annotation
 @ExtendWith(MockitoExtension.class)
 class SchoolRepositoryTest {
 

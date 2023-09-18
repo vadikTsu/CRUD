@@ -19,6 +19,14 @@ public class SchoolRepository {
         this.dataSource = dataSource;
     }
 
+    /**
+     * Fetches groups from database with less or equals number of students.
+     * This method executes stored function get_groups_with_less_students on database server.
+     *
+     * @param numberOfStudents
+     * @return
+     * @throws SQLException
+     */
     public List<Group> getAllGroupsWithLessOrEqualStudents(int numberOfStudents) throws SQLException {
         String query = "SELECT * FROM get_groups_with_less_students(?);";
         try (Connection connection = dataSource.getConnection();
@@ -36,8 +44,16 @@ public class SchoolRepository {
         }
     }
 
-    public List<Student> findAllStudentsRelatedToTheCourse(String courseName) throws SQLException {
-        String query = "SELECT * FROM find_students_related_to_course(?);";
+    /**
+     * Fetches all students related to certain course.
+     * This method executes stored function get_students_related_to_course on database server.
+     *
+     * @param courseName
+     * @return
+     * @throws SQLException
+     */
+    public List<Student> getAllStudentsRelatedToTheCourse(String courseName) throws SQLException {
+        String query = "SELECT * FROM get_students_related_to_course(?);";
         try (Connection connection = dataSource.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(query)) {
             preparedStatement.setString(1, courseName);
@@ -55,10 +71,16 @@ public class SchoolRepository {
         }
     }
 
+    /**
+     * Adds new student.
+     *
+     * @param student
+     * @throws SQLException
+     */
     public void addNewStudent(Student student) throws SQLException {
         String query =
             "INSERT INTO students(group_id, first_name, last_name) " +
-            "VALUES ((SELECT group_id  FROM groups WHERE groups.group_id = ?), ?, ?)";
+            "VALUES (?, ?, ?)";
         try (Connection connection = dataSource.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(query)) {
             preparedStatement.setInt(1, student.getGroupId());
@@ -68,10 +90,16 @@ public class SchoolRepository {
         }
     }
 
-
-    public void addNewStudents(List<Student> students) throws SQLException {
-        String query = "INSERT INTO students(group_id, first_name, last_name) " +
-            "VALUES ((SELECT group_id  FROM groups WHERE groups.group_id = ?), ?, ?)";
+    /**
+     * Adds new students to database from a list.
+     *
+     * @param students
+     * @throws SQLException
+     */
+    public void addNewStudent(List<Student> students) throws SQLException {
+        String query =
+            "INSERT INTO students(group_id, first_name, last_name) " +
+            "VALUES (?, ?, ?);";
         try (Connection connection = dataSource.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(query)) {
             for (Student student : students) {
@@ -82,12 +110,17 @@ public class SchoolRepository {
             }
             preparedStatement.executeBatch();
         }
-
     }
 
+    /**
+     * Removes student from database.
+     *
+     * @param stuedntId
+     * @throws SQLException
+     */
     public void deleteStudent(int stuedntId) throws SQLException {
-        String query = "DELETE FROM students WHERE student_id = ?;" +
-                       " DELETE FROM students_courses WHERE student_id = ?;";
+        String query = " DELETE FROM students_courses WHERE student_id = ?;"+
+                       "DELETE FROM students WHERE student_id = ?;";
         try (Connection connection = dataSource.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(query)) {
             preparedStatement.setInt(1, stuedntId);
@@ -96,12 +129,19 @@ public class SchoolRepository {
         }
     }
 
-    public void reomoveStudentFromCourse(int stuedntId, int courseName) throws SQLException {
+    /**
+     * Removes student from one of their courses.
+     *
+     * @param stuedntId
+     * @param courseId
+     * @throws SQLException
+     */
+    public void reomoveStudentFromCourse(int stuedntId, int courseId) throws SQLException {
         String query = "DELETE FROM students_courses WHERE student_id = ? AND course_id = ? ;";
         try (Connection connection = dataSource.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(query)) {
             preparedStatement.setInt(1, stuedntId);
-            preparedStatement.setInt(2, courseName);
+            preparedStatement.setInt(2, courseId);
             preparedStatement.executeUpdate();
         }
     }

@@ -1,4 +1,4 @@
-package ua.com.foxminded.service;
+package ua.com.foxminded.console;
 
 import ua.com.foxminded.dto.Group;
 import ua.com.foxminded.dto.Student;
@@ -8,12 +8,12 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.Scanner;
 
-public class SchoolService {
+public class SchoolManager {
 
-    private final SchoolRepository emploeeRepository;
+    private final SchoolRepository schoolRepository;
 
-    public SchoolService(SchoolRepository emploeeRepository) {
-        this.emploeeRepository = emploeeRepository;
+    public SchoolManager(SchoolRepository emploeeRepository) {
+        this.schoolRepository = emploeeRepository;
     }
 
     public void getConsole() throws SQLException {
@@ -45,7 +45,7 @@ public class SchoolService {
                     deleteStudentDialog(scanner);
                     break;
                 case "e":
-                    //todo add a list of students (from excel)
+                    //todo add a list of students (from excel or ?)
                     break;
                 case "f":
                     reomoveStudentFromCourseDialog(scanner);
@@ -65,16 +65,16 @@ public class SchoolService {
         System.out.print("Enter the student ID: ");
         int studentId = scanner.nextInt();
         System.out.print("Enter the course name: ");
-        int courseName = scanner.nextInt();
+        int courseId = scanner.nextInt();
         scanner.nextInt();
-        emploeeRepository.reomoveStudentFromCourse(studentId, courseName);
+        schoolRepository.reomoveStudentFromCourse(studentId, courseId);
     }
 
     private void deleteStudentDialog(Scanner scanner) throws SQLException {
         System.out.print("Enter the student ID to delete: ");
         int studentId = scanner.nextInt();
         scanner.nextLine();
-        emploeeRepository.deleteStudent(studentId);
+        schoolRepository.deleteStudent(studentId);
         System.out.println("Student deleted successfully.");
     }
 
@@ -87,14 +87,14 @@ public class SchoolService {
         System.out.print("Enter the student's last name: ");
         String lastName = scanner.nextLine();
         Student newStudent = new Student(0, groupId, firstName, lastName);
-        emploeeRepository.addNewStudent(newStudent);
+        schoolRepository.addNewStudent(newStudent);
         System.out.println("Student added successfully.");
     }
 
     private void findAllStudentsRelatedToTheCourseDialog(Scanner scanner) throws SQLException {
         System.out.print("Enter the course name: ");
         String courseName = scanner.nextLine();
-        List<Student> studentsInCourse = emploeeRepository.findAllStudentsRelatedToTheCourse(courseName);
+        List<Student> studentsInCourse = schoolRepository.getAllStudentsRelatedToTheCourse(courseName);
         studentsInCourse.forEach(System.out::println);
     }
 
@@ -102,7 +102,7 @@ public class SchoolService {
         System.out.print("Enter the maximum number of students: ");
         int maxStudents = scanner.nextInt();
         scanner.nextLine();
-        List<Group> groupsWithLessOrEqualStudents = emploeeRepository.getAllGroupsWithLessOrEqualStudents(maxStudents);
+        List<Group> groupsWithLessOrEqualStudents = schoolRepository.getAllGroupsWithLessOrEqualStudents(maxStudents);
         groupsWithLessOrEqualStudents.forEach(System.out::println);
     }
 }
