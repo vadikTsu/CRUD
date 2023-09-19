@@ -2,6 +2,7 @@ package ua.com.foxminded.repository;
 
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.testcontainers.containers.PostgreSQLContainer;
 import ua.com.foxminded.config.RepositoryConfig;
@@ -10,12 +11,17 @@ import javax.sql.DataSource;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Properties;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 class RepositoryConfigTest {
 
     private static PostgreSQLContainer<?> postgresContainer;
+
+    private DataSource dataSource;
+
+    private Properties properties;
 
     @BeforeAll
     private static void startContainer() {
@@ -26,13 +32,17 @@ class RepositoryConfigTest {
         postgresContainer.start();
     }
 
-    @Test
-    public void testGetPostgresDataSource_shouldEstablisheConnectionToDB_whenPostgresDataSource() throws SQLException {
-        DataSource dataSource = RepositoryConfig.getPostgresDataSource(
-            postgresContainer.getJdbcUrl(),
-            postgresContainer.getUsername(),
-            postgresContainer.getPassword());
+    @BeforeEach
+    private void setDataSource() {
+        properties = new Properties();
+        properties.setProperty("DB_URL", postgresContainer.getJdbcUrl());
+        properties.setProperty("DB_USERNAME", postgresContainer.getUsername());
+        properties.setProperty("DB_PASSWORD", postgresContainer.getPassword());
+        dataSource = RepositoryConfig.getPostgresDataSource(properties);
+    }
 
+    @Test
+    public void getPostgresDataSource_shouldEstablisheConnectionToDB_whenPostgresDataSource() throws SQLException {
         try (Connection connection = dataSource.getConnection()) {
             assertTrue(connection.isValid(4));
             String testQuery = "SELECT 1";
@@ -49,14 +59,9 @@ class RepositoryConfigTest {
     }
 
     @Test
-    public void testGetPostgresDataSource_shouldMigrateTablesSchema_whenPostgresDataSourceExecutesMigrationScript() {
+    public void getPostgresDataSource_shouldMigrateTablesSchema_whenPostgresDataSourceExecutesMigrationScript() {
         var tableNames = Arrays.asList("groups", "students", "courses", "students_courses");
         var actualTableNames = new ArrayList<String>();
-        DataSource dataSource = RepositoryConfig.getPostgresDataSource(
-            postgresContainer.getJdbcUrl(),
-            postgresContainer.getUsername(),
-            postgresContainer.getPassword());
-        assertNotNull(dataSource);
 
         try (Connection connection = dataSource.getConnection()) {
             DatabaseMetaData databaseMetaData = connection.getMetaData();
@@ -77,14 +82,9 @@ class RepositoryConfigTest {
     }
 
     @Test
-    public void testGetPostgresDataSource_shouldMigrateStoredFunctions_whenPostgresDataSourceExecutesMigrationScript() {
+    public void getPostgresDataSource_shouldMigrateStoredFunctions_whenPostgresDataSourceExecutesMigrationScript() {
         var expectedStoredFunctionsName = Arrays.asList("get_groups_with_less_students", "get_students_related_to_course");
         var actualStoredFunctionsName = new ArrayList<String>();
-        DataSource dataSource = RepositoryConfig.getPostgresDataSource(
-            postgresContainer.getJdbcUrl(),
-            postgresContainer.getUsername(),
-            postgresContainer.getPassword());
-        assertNotNull(dataSource);
 
         try (Connection connection = dataSource.getConnection()) {
             DatabaseMetaData databaseMetaData = connection.getMetaData();
