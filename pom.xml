@@ -67,11 +67,6 @@
       <artifactId>flyway-core</artifactId>
       <version>${flyway.version}</version>
     </dependency>
-    <dependency>
-      <groupId>org.aspectj</groupId>
-      <artifactId>aspectjtools</artifactId>
-      <version>1.9.20.1</version>
-    </dependency>
   </dependencies>
 
   <build>
