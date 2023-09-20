@@ -2,7 +2,7 @@ package ua.com.foxminded;
 
 import ua.com.foxminded.config.RepositoryConfig;
 import ua.com.foxminded.console.SchoolManager;
-import ua.com.foxminded.repository.SchoolRepository;
+import ua.com.foxminded.repository.impl.SchoolRepository;
 
 import java.io.IOException;
 import java.io.InputStream;

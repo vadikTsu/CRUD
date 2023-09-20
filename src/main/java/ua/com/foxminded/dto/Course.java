@@ -4,12 +4,12 @@ public class Course {
 
     private int courseId;
     private String courseName;
-    private String course_description;
+    private String courseDescription;
 
-    public Course(int courseId, String courseName, String course_description) {
+    public Course(int courseId, String courseName, String courseDescription) {
         this.courseId = courseId;
         this.courseName = courseName;
-        this.course_description = course_description;
+        this.courseDescription = courseDescription;
     }
 
     public int getCourseId() {
@@ -20,8 +20,8 @@ public class Course {
         return courseName;
     }
 
-    public String getCourse_description() {
-        return course_description;
+    public String getCourseDescription() {
+        return courseDescription;
     }
 
     @Override
@@ -29,7 +29,7 @@ public class Course {
         return "Course{" +
             "courseId=" + courseId +
             ", courseName='" + courseName + '\'' +
-            ", course_description='" + course_description + '\'' +
+            ", course_description='" + courseDescription + '\'' +
             '}';
     }
 }

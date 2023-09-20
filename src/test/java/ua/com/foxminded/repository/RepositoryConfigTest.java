@@ -18,9 +18,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class RepositoryConfigTest {
 
     private static PostgreSQLContainer<?> postgresContainer;
-
     private DataSource dataSource;
-
     private Properties properties;
 
     @BeforeAll
@@ -42,7 +40,7 @@ class RepositoryConfigTest {
     }
 
     @Test
-    public void getPostgresDataSource_shouldEstablisheConnectionToDB_whenPostgresDataSource() throws SQLException {
+    public void getPostgresDataSource_shouldEstablishConnectionToDB_whenPostgresDataSource() throws SQLException {
         try (Connection connection = dataSource.getConnection()) {
             assertTrue(connection.isValid(4));
             String testQuery = "SELECT 1";

@@ -2,7 +2,7 @@ package ua.com.foxminded.console;
 
 import ua.com.foxminded.dto.Group;
 import ua.com.foxminded.dto.Student;
-import ua.com.foxminded.repository.SchoolRepository;
+import ua.com.foxminded.repository.impl.SchoolRepository;
 
 import java.sql.SQLException;
 import java.util.List;
@@ -60,14 +60,13 @@ public class SchoolManager {
         }
     }
 
-
     private void reomoveStudentFromCourseDialog(Scanner scanner) throws SQLException {
         System.out.print("Enter the student ID: ");
         int studentId = scanner.nextInt();
         System.out.print("Enter the course name: ");
         int courseId = scanner.nextInt();
         scanner.nextInt();
-        schoolRepository.reomoveStudentFromCourse(studentId, courseId);
+        schoolRepository.removeStudentFromCourse(studentId, courseId);
     }
 
     private void deleteStudentDialog(Scanner scanner) throws SQLException {
