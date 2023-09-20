@@ -80,6 +80,7 @@
           <user>postgres</user>
           <password>1234</password>
           <locations>classpath:db/migration</locations>
+          <locations>classpath:db/migration_tests</locations>
         </configuration>
       </plugin>
       <plugin>

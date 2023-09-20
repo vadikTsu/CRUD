@@ -79,11 +79,13 @@ CREATE TABLE students_courses
 );
 
 INSERT INTO groups (group_name)
-VALUES ('AA - 45'),
-       ('BC - 19'),
-       ('XY - 73'),
-       ('KJ - 82'),
-       ('OP - 56');
+VALUES
+    ('Group 1'),
+    ('Group 2'),
+    ('Group 3'),
+    ('Group 4'),
+    ('Group 5'),
+    ('Group !!!');
 
 -- Insert data into the students table
 INSERT INTO students (group_id, first_name, last_name)
@@ -116,7 +118,8 @@ VALUES (1, 'John', 'Doe'),
        (5, 'Alvin', 'Dante'),
        (3, 'Yardley', 'Basia'),
        (5, 'Adrienne', 'Jonah'),
-       (1, 'Meghan', 'Hakeem');
+       (1, 'Meghan', 'Hakeem'),
+       (6, 'aasfsa', 'fasdf');
 
 -- Insert data into the courses table
 INSERT INTO courses (course_name, course_description)
@@ -159,5 +162,7 @@ VALUES (1, 3),
        (27, 5),
        (28, 4),
        (29, 3),
-       (30, 2);
+       (30, 2),
+       (31, 6);
+
 

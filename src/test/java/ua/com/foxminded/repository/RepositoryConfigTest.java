@@ -50,6 +50,7 @@ class RepositoryConfigTest {
                  ResultSet resultSet = statement.executeQuery(testQuery)) {
                 assertTrue(resultSet.next());
                 assertEquals(1, resultSet.getInt(1));
+                System.out.println(properties.getProperty("DB_URL"));
             } catch (SQLException e) {
                 fail("Failed to execute test query: " + e.getMessage());
             }

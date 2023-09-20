@@ -81,8 +81,12 @@ public class SchoolRepository {
         String query =
             "INSERT INTO students(group_id, first_name, last_name) " +
                 "VALUES (?, ?, ?)";
+
         try (Connection connection = dataSource.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+            if (student.getFirstName() == null || student.getLastName() == null) {
+                throw new RuntimeException("invalid student`s data");
+            }
             preparedStatement.setInt(1, student.getGroupId());
             preparedStatement.setString(2, student.getFirstName());
             preparedStatement.setString(3, student.getLastName());
@@ -104,6 +108,9 @@ public class SchoolRepository {
         try (Connection connection = dataSource.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(query)) {
             for (Student student : students) {
+                if (student.getFirstName() == null || student.getLastName() == null) {
+                    throw new RuntimeException("invalid student`s data");
+                }
                 preparedStatement.setInt(1, student.getGroupId());
                 preparedStatement.setString(2, student.getFirstName());
                 preparedStatement.setString(3, student.getLastName());

@@ -1,132 +1,134 @@
 package ua.com.foxminded.repository;
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.junit.jupiter.api.*;
+import org.testcontainers.containers.PostgreSQLContainer;
+import ua.com.foxminded.config.RepositoryConfig;
 import ua.com.foxminded.dto.Group;
 import ua.com.foxminded.dto.Student;
 
 import javax.sql.DataSource;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.*;
 
-@ExtendWith(MockitoExtension.class)
 class SchoolRepositoryTest {
 
-    @Mock
-    private DataSource dataSource;
-
-    @InjectMocks
+    private static PostgreSQLContainer<?> postgresContainer;
     private SchoolRepository schoolRepository;
+    DataSource dataSource;
+    private Properties properties;
 
-    @Mock
-    private Connection connection;
-
-    @Mock
-    private PreparedStatement preparedStatement;
-
-    @Mock
-    private ResultSet resultSet;
+    @BeforeAll
+    private static void startContainer() {
+        postgresContainer = new PostgreSQLContainer<>("postgres:latest")
+            .withDatabaseName("testdb")
+            .withUsername("testuser")
+            .withPassword("testpassword");
+        postgresContainer.start();
+    }
 
     @BeforeEach
-    void setUp() throws SQLException {
-        when(dataSource.getConnection()).thenReturn(connection);
-        when(connection.prepareStatement(anyString())).thenReturn(preparedStatement);
+    private void setDataSource() {
+        properties = new Properties();
+        properties.setProperty("DB_URL", postgresContainer.getJdbcUrl());
+        properties.setProperty("DB_USERNAME", postgresContainer.getUsername());
+        properties.setProperty("DB_PASSWORD", postgresContainer.getPassword());
+        dataSource = RepositoryConfig.getPostgresDataSource(properties);
+        schoolRepository = new SchoolRepository(dataSource);
+    }
+
+    @AfterAll
+    public static void stopContainer() {
+        postgresContainer.stop();
     }
 
     @Test
-    void getAllGroupsWithLessOrEqualStudents() throws SQLException {
-        Group group = new Group(1, "Group 1");
-
-        when(resultSet.next()).thenReturn(true).thenReturn(false);
-        when(resultSet.getInt("group_id")).thenReturn(group.getGroupId());
-        when(resultSet.getString("group_name")).thenReturn(group.getGroupName());
-        when(preparedStatement.executeQuery()).thenReturn(resultSet);
-
-        List<Group> groups = schoolRepository.getAllGroupsWithLessOrEqualStudents(12);  //any int passed as argument
-
-        assertEquals(1, groups.size());
-        assertEquals(group, groups.get(0));
+    public void getAllGroupsWithLessOrEqualStudents_shouldFetchAllGroups_whenMaximalInteger() {
+        try {
+            List<Group> groups = schoolRepository.getAllGroupsWithLessOrEqualStudents(Integer.MAX_VALUE);
+            Assertions.assertNotNull(groups);
+            groups.forEach(group ->
+                Assertions.assertTrue(group.getGroupName().matches("^[A-Z]{2}\\s-\\s\\d{2}$")));
+        } catch (SQLException e) {
+            //todo
+        }
     }
 
     @Test
     void getAllStudentsRelatedToTheCourse() throws SQLException {
-        Student student = new Student(1, 1, "Pepe", "Frog");
+        List<Student> students = schoolRepository.getAllStudentsRelatedToTheCourse("Biology");
+        Assertions.assertFalse(students.isEmpty());
 
-        when(resultSet.next()).thenReturn(true).thenReturn(false);
-        when(resultSet.getInt("student_id")).thenReturn(student.getStudentId());
-        when(resultSet.getInt("group_id")).thenReturn(student.getGroupId());
-        when(resultSet.getString("first_name")).thenReturn(student.getFirstName());
-        when(resultSet.getString("last_name")).thenReturn(student.getLastName());
-        when(preparedStatement.executeQuery()).thenReturn(resultSet);
-
-        List<Student> students = schoolRepository.getAllStudentsRelatedToTheCourse("some_course");  //any int passed as argument
-
-        assertEquals(1, students.size());
-        assertEquals(student, students.get(0));
+        students = schoolRepository.getAllStudentsRelatedToTheCourse("History of USSSR");
+        Assertions.assertTrue(students.isEmpty());
     }
 
     @Test
     void addNewStudent_shouldCorrectlySetValuesForPreparedStatement_whenStudentArgument() throws SQLException {
-        when(preparedStatement.executeUpdate()).thenReturn(1);
-
         int changes = schoolRepository.addNewStudent(new Student(1, 1, "Pepe", "Frog"));
-        verify(preparedStatement, times(1)).setInt(anyInt(), anyInt());
-        verify(preparedStatement, times(2)).setString(anyInt(), anyString());
-        verify(preparedStatement).executeUpdate();
-        assertEquals(1, changes);
+        Assertions.assertEquals(1, changes);
     }
 
     @Test
-    void addNewStudent_shouldThrowNullPointerException_whenNullArgument() throws SQLException {
-        verifyNoInteractions(preparedStatement);
-        assertThrows(NullPointerException.class, () -> schoolRepository.addNewStudent((Student) null));
+    void addNewStudent_shouldThrowRuntimeException_whenInvalidStudentArgument() throws SQLException {
+        Exception e = Assertions.assertThrows(RuntimeException.class, () -> schoolRepository
+            .addNewStudent(new Student(1, 1, null, "Frog")));
+        Assertions.assertEquals("invalid student`s data", e.getMessage());
     }
 
     @Test
     void addNewStudent_shouldProcessBatching_whenListOfStudentsArgument() throws SQLException {
-        List<Student> students = new ArrayList<>();
-        students.add(new Student(1, 3, "Vasya", "Pupkin"));
-        students.add(new Student(2, 2, "Dyadya", "Petiea"));
-
+        List<Student> students = List.of(new Student(2, 2, "Dyadya", "Petiea"),
+            new Student(1, 3, "Vasya", "Pupkin"));
         schoolRepository.addNewStudent(students);
-
-        verify(preparedStatement, times(2)).addBatch();
-        verify(preparedStatement, times(2)).setInt(anyInt(), anyInt());
-        verify(preparedStatement, times(4)).setString(anyInt(), anyString());
-        verify(preparedStatement, times(1)).executeBatch();
     }
 
     @Test
-    void deleteStudent_shouldCorrectlySetValuesForPreparedStatement_whenSrudentIdArgument() throws SQLException {
-        when(preparedStatement.executeUpdate()).thenReturn(1);
+    void testDeleteStudent() {
+        int studentIdToDelete = 1;
+        try {
+            int changes = schoolRepository.deleteStudent(studentIdToDelete);
 
-        int changes = schoolRepository.deleteStudent(123);
-        verify(preparedStatement, times(2)).setInt(anyInt(), anyInt());
-        verify(preparedStatement).executeUpdate();
-        assertEquals(1, changes);
+            assertEquals(2, changes);
+        } catch (SQLException e) {
+            fail("Exception should not be thrown for an existing student");
+        }
     }
 
     @Test
-    void reomoveStudentFromCourse_shouldCorrectlySetValuesForPreparedStatement_whenSrudentIdAndCoursIdArgument()
-        throws SQLException {
-        when(preparedStatement.executeUpdate()).thenReturn(1);
+    void testDeleteNonexistentStudent() {
+        int nonexistentStudentId = 1000;
+        try {
+            int changes = schoolRepository.deleteStudent(nonexistentStudentId);
+            assertEquals(0, changes);
+        } catch (SQLException e) {
+            fail("Exception should not be thrown for a nonexistent student");
+        }
+    }
 
-        int changes = schoolRepository.reomoveStudentFromCourse(123, 123);
-        verify(preparedStatement, times(2)).setInt(anyInt(), anyInt());
-        verify(preparedStatement).executeUpdate();
-        assertEquals(1, changes);
+    @Test
+    void testRemoveStudentFromCourse() {
+        int studentId = 1;
+        int courseId = 1;
+        try {
+            int changes = schoolRepository.reomoveStudentFromCourse(studentId, courseId);
+            assertEquals(1, changes);
+        } catch (SQLException e) {
+            fail("Exception should not be thrown for a valid student and course");
+        }
+    }
+
+    @Test
+    void testRemoveStudentFromNonexistentCourse() {
+        int studentId = 1;
+        int nonexistentCourseId = 1000;
+        try {
+            int changes = schoolRepository.reomoveStudentFromCourse(studentId, nonexistentCourseId);
+            assertEquals(0, changes);
+        } catch (SQLException e) {
+            fail("Exception should not be thrown for a nonexistent course");
+        }
     }
 }
